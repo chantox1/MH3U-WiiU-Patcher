@@ -1,0 +1,9 @@
+BaseDefTo1
+01
+0x00463197,0x00B8005B
+1
+
+RawDebloater
+00000064
+0x0017C9FC
+14
