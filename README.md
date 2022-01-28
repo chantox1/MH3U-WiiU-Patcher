@@ -28,6 +28,10 @@ Patches in patches.txt are separated by newlines, and sport the following fields
 As an example, the provided patch 'RawDebloater' will seek to offset 0x0017C9FC in the extracted rpx (referred to as 'code.bin' in this project). There, it will write 00000064 14 times; that is: 
 > 0000006400000064000000640000006400000064000000640000006400000064000000640000006400000064000000640000006400000064
 
+# Building
+
+If compiling yourself, take a look at the import statements and verify everything is properly linked. You will need the [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) executable at the same level as the patcher's.
+
 # Special Thanks
 CBH, for providing [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) under the GPLv3.
 
