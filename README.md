@@ -1,4 +1,4 @@
-# MH3U Wii U Patcher
+# MH3U RPX Patcher
 
 Binary patcher for MH3U. Currently features two patches, **BaseDefTo1** and **RawDebloater**. 
 
