@@ -28,6 +28,14 @@ Patches in patches.txt are separated by newlines, and sport the following fields
 As an example, the provided patch 'RawDebloater' will seek to offset 0x0017C9FC in the extracted rpx (referred to as 'code.bin' in this project). There, it will write 00000064 14 times; that is: 
 > 0000006400000064000000640000006400000064000000640000006400000064000000640000006400000064000000640000006400000064
 
+**Formatting**:  
+Everything is written to patches.txt in plaintext, however, there are some considerations as to how each field is read:
+- Name: What you write is what you get.
+- Data: Every two characters represent a byte, big endian. For example, '1234' will write 0x12 0x34 to code.bin. Only hexadecimal characters are allowed here, with no specifiers (such as '0x', 'h').
+- Offsets: Each offset is an integer value, read automatically according to content. '1234' will be taken as decimal, while 0x1234 will be taken as hexadecimal. Each offset is comma-separated, with no spaces in between. Offsets are relative to the extracted code.bin, not so the full game, which starts its code section at a given offset.
+- N_Loops: Decimal integer value. Usually '1' for 'write once to each offset'. This field is only meant as a convenience for writing repetitive data.
+
+
 ## Building
 
 If compiling yourself, please take a look at the import statements and verify everything is properly linked (particularly OpenSSL).  
