@@ -13,9 +13,9 @@
 #include <filesystem>
 #include <openssl/md5.h>
 #include "util.h"
-namespace fs = std::filesystem;
 using namespace std;
 
+const unsigned char rpxHash[] = "\x38\x22\x89\x66\x3e\xb3\xbf\x8a\x73\x88\x42\x60\x69\x04\x49\xd8";
 
 class Patch {
     public:
@@ -32,8 +32,6 @@ class Patch {
         }
 };
 
-const unsigned char rpxHash[] = "\x38\x22\x89\x66\x3e\xb3\xbf\x8a\x73\x88\x42\x60\x69\x04\x49\xd8";
-
 void getPatches(vector<Patch> &patchList) {
     string name;
     string data;
@@ -42,27 +40,28 @@ void getPatches(vector<Patch> &patchList) {
 
     ifstream patches("patches.txt");
     string line;
-    int count = 0;
+    int count = 1;
     while (getline(patches, line)) {
-        if (count == 0){
+        if (count == 1)
             name = line;
-        }
-        else if (count == 1)
-            data = hexifyStr(line);
         else if (count == 2)
+            data = hexifyStr(line);
+        else if (count == 3)
             pushOffsets(offsets, line);
-        else if (count == 3) {
+        else if (count == 4) {
             int n_loops = stoi(line);
+
             patchList.push_back(Patch(name, data, offsets, n_loops));
+            offsets.clear();
         }
-        else offsets.clear();
-        count = (count > 3) ? 0 : count + 1;
+        else count = 0;
+        count++;
     }
 }
 
 void applyPatches(vector<Patch> &patchList, char *path) {
     // Decompress into code.bin
-    fs::copy_file(path, "./temp.rpx");
+    filesystem::copy_file(path, "./temp.rpx");
     system("wiiurpxtool -d temp.rpx code.bin");
     remove("temp.rpx");
 
@@ -94,7 +93,7 @@ void applyPatches(vector<Patch> &patchList, char *path) {
     // Recompress & replace original at path
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
-    remove("code.bin");
+    //remove("code.bin");
 }
 
 bool checkMD5(char *path) {
