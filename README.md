@@ -1,4 +1,4 @@
-# MH3U-WiiU-Patcher
+# MH3U Wii U Patcher
 
 Binary patcher for MH3U. Currently features two patches, **BaseDefTo1** and **RawDebloater**. 
 
@@ -30,7 +30,8 @@ As an example, the provided patch 'RawDebloater' will seek to offset 0x0017C9FC 
 
 ## Building
 
-If compiling yourself, take a look at the import statements and verify everything is properly linked. You will need the [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) executable at the same level as the patcher's.
+If compiling yourself, please take a look at the import statements and verify everything is properly linked (particularly OpenSSL).  
+You will need the [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) executable at the same level as the patcher's when running.
 
 ## Special Thanks
 CBH, for providing [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) under the GPLv3.
