@@ -12,6 +12,7 @@
 #include <direct.h> 
 #include <filesystem>
 #include <openssl/md5.h>
+#include "util.h"
 namespace fs = std::filesystem;
 using namespace std;
 
@@ -33,16 +34,6 @@ class Patch {
 
 const unsigned char rpxHash[] = "\x38\x22\x89\x66\x3e\xb3\xbf\x8a\x73\x88\x42\x60\x69\x04\x49\xd8";
 
-std::string hexifyStr(std::string str) {
-    std::string res;
-    for(std::string::size_type i=0; i+1 < str.size(); i=i+2) {
-        std::string nextByte = str.substr(i,2);
-        int val = std::stoi(nextByte, nullptr, 16);
-        res += (unsigned char) val;
-    }
-    return res;
-}
-
 void getPatches(vector<Patch> &patchList) {
     string name;
     string data;
@@ -52,21 +43,14 @@ void getPatches(vector<Patch> &patchList) {
     ifstream patches("patches.txt");
     string line;
     int count = 0;
-
     while (getline(patches, line)) {
         if (count == 0){
             name = line;
         }
         else if (count == 1)
             data = hexifyStr(line);
-        else if (count == 2) {
-            stringstream ss(line);
-            string tempOffset;
-            while (ss.good()) {
-                getline(ss, tempOffset, ',');
-                offsets.push_back(stoi(tempOffset, nullptr, 0));
-            }
-        }
+        else if (count == 2)
+            pushOffsets(offsets, line);
         else if (count == 3) {
             int n_loops = stoi(line);
             patchList.push_back(Patch(name, data, offsets, n_loops));
@@ -100,26 +84,22 @@ void applyPatches(vector<Patch> &patchList, char *path) {
         }
     }
     fclose(code);
-
-    char saveDir[_MAX_DIR], tempPath[_MAX_DIR];
-    _splitpath(path, saveDir, tempPath, NULL, NULL);
-    strcat(saveDir, tempPath);
     
     // Create backup
     char bkpPath[_MAX_PATH];
-    strcpy(bkpPath, saveDir);
+    stripFilename(path, bkpPath);
     strcat(bkpPath, "MH3G_Cafe_EU.bkp");
     rename(path, bkpPath);
 
     // Recompress & replace original at path
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
-    remove("code.bin");
+    //remove("code.bin");
 }
 
 bool checkMD5(char *path) {
     unsigned long filesize;
-    char* file_buffer;
+    char* fileBuffer;
     ifstream t;
 
     // Get filesize
@@ -130,10 +110,10 @@ bool checkMD5(char *path) {
 
     // Read file into memory & get MD5
     unsigned char result[MD5_DIGEST_LENGTH];
-    file_buffer = new char[filesize];
-    t.read((char*) file_buffer, filesize);
-    MD5((unsigned char*) file_buffer, filesize, result);
-    delete file_buffer;
+    fileBuffer = new char[filesize];
+    t.read((char*) fileBuffer, filesize);
+    MD5((unsigned char*) fileBuffer, filesize, result);
+    delete fileBuffer;
     t.close();
 
     // Compare to pre-defined hash
@@ -146,9 +126,8 @@ bool checkMD5(char *path) {
 
 int main (int argc, char* argv[]) {
     if (argc == 2) {
-        char workingDir[_MAX_PATH], tempPath[_MAX_PATH];
-        _splitpath(argv[0], workingDir, tempPath, NULL, NULL);
-        strcat(workingDir, tempPath);
+       char workingDir[_MAX_DIR];
+       stripFilename(argv[0], workingDir);
         _chdir(workingDir);
 
         char *path = argv[1];
