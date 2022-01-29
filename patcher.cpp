@@ -94,7 +94,7 @@ void applyPatches(vector<Patch> &patchList, char *path) {
     // Recompress & replace original at path
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
-    //remove("code.bin");
+    remove("code.bin");
 }
 
 bool checkMD5(char *path) {

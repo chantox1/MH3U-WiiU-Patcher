@@ -1,6 +1,7 @@
 # Compiled source #
 ###################
 *.exe
+*.bin
 
 # VSCode settings #
 ###################
