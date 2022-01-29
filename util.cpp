@@ -2,12 +2,41 @@
 #include <stdlib.h>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <cstring>
+#include <openssl/md5.h>
 
 void stripFilename(char *in, char *out) {
     char dir[_MAX_DIR];
     _splitpath(in, out, dir, NULL, NULL);
     strcat(out, dir);
+}
+
+bool checkMD5(char *path, const unsigned char *hash) {
+    unsigned long filesize;
+    char* fileBuffer;
+    std::ifstream t;
+
+    // Get filesize
+    t.open(path);
+    t.seekg(0, std::ios::end);
+    filesize = t.tellg();
+    t.seekg(0, std::ios::beg);
+
+    // Read file into memory & get MD5
+    unsigned char result[MD5_DIGEST_LENGTH];
+    fileBuffer = new char[filesize];
+    t.read((char*) fileBuffer, filesize);
+    MD5((unsigned char*) fileBuffer, filesize, result);
+    delete fileBuffer;
+    t.close();
+
+    // Compare to pre-defined hash
+    for (int i=0; i < MD5_DIGEST_LENGTH; i++) {
+        if (result[i] != hash[i])
+            return false;
+    }
+    return true;
 }
 
 std::string hexifyStr(std::string str) {

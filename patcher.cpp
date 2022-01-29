@@ -7,11 +7,9 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <sstream>
 #include <fstream>
 #include <direct.h> 
 #include <filesystem>
-#include <openssl/md5.h>
 #include "util.h"
 using namespace std;
 
@@ -93,34 +91,7 @@ void applyPatches(vector<Patch> &patchList, char *path) {
     // Recompress & replace original at path
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
-    //remove("code.bin");
-}
-
-bool checkMD5(char *path) {
-    unsigned long filesize;
-    char* fileBuffer;
-    ifstream t;
-
-    // Get filesize
-    t.open(path);
-    t.seekg(0, ios::end);
-    filesize = t.tellg();
-    t.seekg(0, ios::beg);
-
-    // Read file into memory & get MD5
-    unsigned char result[MD5_DIGEST_LENGTH];
-    fileBuffer = new char[filesize];
-    t.read((char*) fileBuffer, filesize);
-    MD5((unsigned char*) fileBuffer, filesize, result);
-    delete fileBuffer;
-    t.close();
-
-    // Compare to pre-defined hash
-    for (int i=0; i < MD5_DIGEST_LENGTH; i++) {
-        if (result[i] != rpxHash[i])
-            return false;
-    }
-    return true;
+    remove("code.bin");
 }
 
 int main (int argc, char* argv[]) {
@@ -130,7 +101,8 @@ int main (int argc, char* argv[]) {
         _chdir(workingDir);
 
         char *path = argv[1];
-        if (checkMD5(path)) {
+        if (checkMD5(path, rpxHash)) {
+            cout << "Commencing patch process.\n";
             vector<Patch> patchList;
             getPatches(patchList);
             applyPatches(patchList, path);
@@ -138,7 +110,7 @@ int main (int argc, char* argv[]) {
         }
         else 
             cout << "File does not match expected MD5 hash.\n"
-                    "Please ensure the file provided is unpatched, and"
+                    "Please ensure the file provided is unpatched, and "
                     "corresponds to the EUR / PAL version of the game.\n";
         system("pause");
     }
