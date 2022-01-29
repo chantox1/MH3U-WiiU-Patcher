@@ -38,7 +38,7 @@ Everything is written to patches.txt in plaintext, however, there are some consi
 
 ## Building
 
-If compiling yourself, please take a look at the import statements and verify everything is properly linked (particularly OpenSSL).  
+Requires OpenSSL v1.1.1 (current version probably works, but is untested). Make sure to link it properly.
 You will need the [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) executable at the same level as the patcher's when running.
 
 ## Special Thanks
