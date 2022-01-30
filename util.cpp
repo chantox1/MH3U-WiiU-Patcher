@@ -4,10 +4,11 @@
 
 #include "util.h"
 #include <stdlib.h>
+#include <iostream>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <fstream>
-#include <cstring>
 #include <openssl/md5.h>
 
 void stripFilename(char *in, char *out) {
@@ -17,30 +18,43 @@ void stripFilename(char *in, char *out) {
 }
 
 bool checkMD5(char *path, const unsigned char *hash) {
-    unsigned long filesize;
-    char* fileBuffer;
     std::ifstream t;
+    char *fileBuffer;
+    unsigned long filesize;
 
-    // Get filesize
-    t.open(path);
-    t.seekg(0, std::ios::end);
-    filesize = t.tellg();
-    t.seekg(0, std::ios::beg);
+    if (!loadFile(t, &fileBuffer, filesize, path)) {
+        unsigned char result[MD5_DIGEST_LENGTH];
+        MD5((unsigned char*) fileBuffer, filesize, result);
+        delete fileBuffer;
+        t.close();
 
-    // Read file into memory & get MD5
-    unsigned char result[MD5_DIGEST_LENGTH];
-    fileBuffer = new char[filesize];
-    t.read((char*) fileBuffer, filesize);
-    MD5((unsigned char*) fileBuffer, filesize, result);
-    delete fileBuffer;
-    t.close();
-
-    // Compare to pre-defined hash
-    for (int i=0; i < MD5_DIGEST_LENGTH; i++) {
-        if (result[i] != hash[i])
-            return false;
+        for (int i=0; i < MD5_DIGEST_LENGTH; i++) {
+            if (result[i] != hash[i]) {
+                return false;
+            }
+        }
+        return true;
     }
-    return true;
+    return false;
+}
+
+int loadFile(std::ifstream &t, char **fileBuffer, unsigned long &filesize, char *path) {
+    t.exceptions(std::ifstream::badbit);
+    try {
+        t.open(path);
+        t.seekg(0, std::ios::end);
+        filesize = t.tellg();
+        t.seekg(0, std::ios::beg);
+
+        *fileBuffer = new char[filesize];
+        t.read(*fileBuffer, filesize);
+    }
+    catch(const std::ifstream::failure &f) {
+        std::cout
+            << "Exception occurred while opening or reading file at" << path << "\n";
+        return -1;
+    }
+    return 0;
 }
 
 std::string hexifyStr(std::string str) {
