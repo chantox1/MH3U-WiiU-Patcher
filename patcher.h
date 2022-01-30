@@ -10,3 +10,18 @@ const char md5Error[] = "The file provided failed to match the expected MD5 hash
 
 const char patchError[] =   "Patching failed.\n"
                             "Please ensure you have write access to the patcher's directory.\n";
+
+class Patch {
+    public:
+        string name;
+        string data;
+        vector<int> offsets;
+        int n_loops;
+
+        Patch(string name, string data, vector<int> offsets, int n_loops) {
+            this->name = name;
+            this->data = data;
+            this->offsets = offsets;
+            this->n_loops = n_loops;
+        }
+};

@@ -15,21 +15,6 @@
 using namespace std;
 namespace fs = filesystem;
 
-class Patch {
-    public:
-        string name;
-        string data;
-        vector<int> offsets;
-        int n_loops;
-
-        Patch(string name, string data, vector<int> offsets, int n_loops) {
-            this->name = name;
-            this->data = data;
-            this->offsets = offsets;
-            this->n_loops = n_loops;
-        }
-};
-
 void getPatches(vector<Patch> &patchList) {
     string name;
     string data;

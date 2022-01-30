@@ -7,3 +7,7 @@
 # VSCode settings #
 ###################
 .vscode/*
+
+# Files in testing #
+####################
+.test/
