@@ -4,9 +4,7 @@
 
 #include "patcher.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <iostream>
-#include <string>
 #include <cstring>
 #include <fstream>
 #include <direct.h> 
@@ -42,6 +40,24 @@ void getPatches(vector<Patch> &patchList) {
         }
         else count = 0;
         count++;
+    }
+}
+
+void newGetPatches(vector<Patch_new> &patchList) {
+    string name;
+    vector<PatchData> data;
+    int n_loops;
+
+    ifstream patchReader;
+    patchReader.exceptions(ifstream::badbit);
+    try {
+        patchReader.open(".test/newPatches.txt");
+        while (patchReader.good()) {
+            cout << "Nice";
+        }
+    }
+    catch (const ifstream::failure& f) {
+        cout << "Exception occurred while reading patches.txt\n";
     }
 }
 
