@@ -67,7 +67,8 @@ int applyPatches(vector<Patch> &patchList, char *path) {
     if (state != 0) {
         throw invalid_argument("Error decompressing file.\n"
                                "Invalid call to wiiurpxtool. "
-                               "Ensure you have write access to the rpx directory.\n");
+                               "Ensure you have write access to the patcher directory, and"
+                               "that MH3G_Cafe_EU.rpx is accessible.\n");
     }
 
     // Iterate over patchList & patch
