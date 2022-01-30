@@ -57,11 +57,18 @@ void getPatches(vector<Patch> &patchList) {
     }
 }
 
-void applyPatches(vector<Patch> &patchList, char *path) {
+int applyPatches(vector<Patch> &patchList, char *path) {
+    int state;
+
     // Decompress into code.bin
     filesystem::copy_file(path, "./temp.rpx");
-    system("wiiurpxtool -d temp.rpx code.bin");
+    state = system("wiiurpxtool -d temp.rpx code.bin");
     remove("temp.rpx");
+    if (state != 0) {
+        throw invalid_argument("Error decompressing file.\n"
+                               "Invalid call to wiiurpxtool. "
+                               "Ensure you have write access to the rpx directory.\n");
+    }
 
     // Iterate over patchList & patch
     FILE *code = fopen("code.bin", "r+");
@@ -92,9 +99,13 @@ void applyPatches(vector<Patch> &patchList, char *path) {
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
     remove("code.bin");
+
+    return 0;
 }
 
 int main (int argc, char* argv[]) {
+    int state;
+
     if (argc == 2) {
        char workingDir[_MAX_DIR];
        stripFilename(argv[0], workingDir);
@@ -105,8 +116,15 @@ int main (int argc, char* argv[]) {
             cout << "Commencing patch process.\n";
             vector<Patch> patchList;
             getPatches(patchList);
-            applyPatches(patchList, path);
-            cout << "Patching complete!\n";
+            try {
+                applyPatches(patchList, path);
+            }
+            catch(const exception &e) {
+                state = -1;
+                cerr << e.what();
+            }
+            if (state == 0)
+                cout << "Patching complete!\n";
         }
         else 
             cout << "File does not match expected MD5 hash.\n"
