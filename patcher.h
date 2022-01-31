@@ -15,33 +15,18 @@ const char md5Error[] = "The file provided failed to match the expected MD5 hash
 const char patchError[] =   "Patching failed.\n"
                             "Please ensure you have write access to the patcher's directory.\n";
 
-class Patch {
-    public:
-        std::string name;
-        std::string data;
-        std::vector<int> offsets;
-        int n_loops;
-
-        Patch(std::string name, std::string data, std::vector<int> offsets, int n_loops) {
-            this->name = name;
-            this->data = data;
-            this->offsets = offsets;
-            this->n_loops = n_loops;
-        }
-};
-
 struct PatchData {
     std::string payload;
     std::vector<int> offsets;
     int n_loops;
 };
 
-class Patch_new {
+class Patch {
     public:
         std::string name;
         std::vector<PatchData> data;
 
-        Patch_new(std::string name, std::vector<PatchData> data) {
+        Patch(std::string name, std::vector<PatchData> data) {
             this->name = name;
             this->data = data;
         }

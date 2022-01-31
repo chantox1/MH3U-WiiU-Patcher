@@ -1,9 +1,5 @@
-BaseDefTo1
-01
-0x00463197,0x00B8005B
-1
+MH3G Defense
+[01 @ 0x00463197, 0x00B8005B]
 
-RawDebloater
-00000064
-0x0017C9FC
-14
+Debloated Raw
+[00 00 00 64 x14 @ 0x0017C9FC]

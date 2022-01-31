@@ -15,36 +15,6 @@ namespace fs = filesystem;
 
 void getPatches(vector<Patch> &patchList) {
     string name;
-    string data;
-    vector<int> offsets;
-    int n_loops;
-
-    ifstream patches("patches.txt");
-    string line;
-    int count = 1;
-    while (getline(patches, line)) {
-        if (count == 1) {
-            name = line;
-        }
-        else if (count == 2) {
-            data = hexifyStr(line);
-        }
-        else if (count == 3) {
-            pushOffsets(offsets, line);
-        }
-        else if (count == 4) {
-            int n_loops = stoi(line);
-
-            patchList.push_back(Patch(name, data, offsets, n_loops));
-            offsets.clear();
-        }
-        else count = 0;
-        count++;
-    }
-}
-
-void newGetPatches(vector<Patch_new> &patchList) {
-    string name;
     std::string payload;
     vector<int> offsets;
     int n_loops;
@@ -54,7 +24,7 @@ void newGetPatches(vector<Patch_new> &patchList) {
     patchReader.exceptions(ifstream::badbit);
     char ch;
     try {
-        patchReader.open(".test/newPatches.txt");
+        patchReader.open("patches.txt");
         readCharIgnoreWS(patchReader, ch);
         while (patchReader.good()) {
             name += ch;
@@ -66,8 +36,9 @@ void newGetPatches(vector<Patch_new> &patchList) {
                 readCharIgnoreWS(patchReader, ch);
             }
 
-            patchList.push_back(Patch_new(name, data));
+            patchList.push_back(Patch(name, data));
             name.clear();
+            payload.clear();
             offsets.clear();
             data.clear();
         }
@@ -90,24 +61,27 @@ int applyPatches(vector<Patch> &patchList, char *path) {
     remove("temp.rpx");
 
     // Iterate over patchList & patch
-    FILE *code = fopen("code.bin", "r+");
+    FILE *code = fopen("code.bin", "rb+");
     string in;
-    for (auto & element : patchList) {
-        cout << "Apply patch \"" + element.name + "\"? Y/N\n";
+    for (auto & patch : patchList) {
+        cout << "Apply patch \"" + patch.name + "\"? Y/N\n";
         cin >> in;
         if (!in.compare("Y")) {
-            string data = element.data;
-            int datasize = data.size();
-            for (auto & offset : element.offsets) {
-                for (int i=0; i < element.n_loops; i++) {
-                    fseek(code, offset + i*datasize, SEEK_SET);
-                    fwrite(data.c_str(), datasize, 1, code);
+            for (auto & data : patch.data) {
+                string payload = data.payload;
+                int loadSize = payload.size();
+                int n_loops = data.n_loops;
+                for (auto & offset : data.offsets) {
+                    for (int i=0; i < n_loops; i++) {
+                        fseek(code, offset + i*loadSize, SEEK_SET);
+                        fwrite(payload.c_str(), loadSize, 1, code);
+                    }
                 }
             }
         }
     }
     fclose(code);
-    
+
     // Create backup
     char bkpPath[_MAX_PATH];
     stripFilename(path, bkpPath);
@@ -118,7 +92,6 @@ int applyPatches(vector<Patch> &patchList, char *path) {
     system("wiiurpxtool -c code.bin temp.rpx");
     rename("temp.rpx", path);
     remove("code.bin");
-
     return 0;
 }
 
@@ -131,31 +104,21 @@ int main (int argc, char* argv[]) {
         char *path = argv[1];
         if (checkMD5(path, rpxHash)) {
             cout << "Commencing patch process.\n";
-            vector<Patch_new> patchList;
-            newGetPatches(patchList);
-            for (auto & element : patchList) {
-                cout << element.name << "\n";
-            }
-            /*
             vector<Patch> patchList;
             getPatches(patchList);
-            if (!applyPatches(patchList, path)){
-                cout << "Patching complete!\n";
+            if (!applyPatches(patchList, path)) {
+                cout << "Patching complete, enjoy!\n";
             }
-            else {
-                cout << patchError;
-            }
-            */
         }
         else {
             cout << md5Error;
         }
-        system("pause");
     }
     else {
         cout << "No file provided.\n"
                 "Please drag-and-drop MH3U_Cafe_EU.rpx onto the exe.\n";
-        system("pause");
     }
+
+    system("pause");
     return 0;
 }
