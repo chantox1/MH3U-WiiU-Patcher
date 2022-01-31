@@ -23,7 +23,8 @@ Patches in patches.txt first feature a name, which is used to prompt the user fo
 After this is the data section; generally: [ Payload xLoops @ Offset1, Offset2, ..., Offsetn ]  
 A patch can have multiple PatchData objects, which are surrounded by square brackets. First is the payload, where every two characters represent a byte: '00' will write '\x00'.
 This is followed optionally by 'x', after which comes a decimal value which indicates the amount of times it will be written to each offset: '1212' is the same as '12 x2'. If 'x' is not present, 'x1' is assumed.  
-Next, is the '@' character, which indicates the start of offsets. Offsets are integer-valued, and read according to format: '1000' is read as decimal 1000, '0x1000' is read as decimal 4096. Each offset indicates an absolute position relative to the extracted rpx (code.bin), not so the actual game, where the start of the code is at an offset. Offsets are comma-separated, and the payload is written to every one.
+Next, is the '@' character, which indicates the start of offsets. Offsets are integer-valued, and read according to format: '1000' is read as decimal 1000, '0x1000' is read as decimal 4096. Each offset indicates an absolute position relative to the extracted rpx (code.bin), not so the actual game, where the start of the code is at an offset. Offsets are comma-separated, and the payload is written to every one.  
+All fields in patches.txt are built to be tolerant to all sorts of whitespace to accomodate different styles of writing.
 
 As an example, the provided patch 'RawDebloater' will seek to offset 0x0017C9FC in code.bin. There, it will write 00000064 14 times; that is: 
 > 0000006400000064000000640000006400000064000000640000006400000064000000640000006400000064000000640000006400000064
