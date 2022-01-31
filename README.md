@@ -35,7 +35,7 @@ As an example, the provided patch 'RawDebloater' will seek to offset 0x0017C9FC 
 Requires OpenSSL v1.1.1 (current version probably works, but is untested). Make sure to link it properly.  
 You will need the [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) executable at the same level as the patcher's when running.
 
-# Contact
+## Contact
 
 My Discord tag is Chantox#3045. Please add me and send me a DM if you're experiencing any issues.
 
