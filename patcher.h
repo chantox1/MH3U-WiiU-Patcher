@@ -33,11 +33,16 @@ class Patch {
 struct PatchData {
     std::string payload;
     std::vector<int> offsets;
+    int n_loops;
 };
 
 class Patch_new {
     public:
         std::string name;
         std::vector<PatchData> data;
-        int n_loops;
+
+        Patch_new(std::string name, std::vector<PatchData> data) {
+            this->name = name;
+            this->data = data;
+        }
 };

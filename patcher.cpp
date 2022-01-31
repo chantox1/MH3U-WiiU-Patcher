@@ -45,15 +45,31 @@ void getPatches(vector<Patch> &patchList) {
 
 void newGetPatches(vector<Patch_new> &patchList) {
     string name;
-    vector<PatchData> data;
+    std::string payload;
+    vector<int> offsets;
     int n_loops;
+    vector<PatchData> data;
 
     ifstream patchReader;
     patchReader.exceptions(ifstream::badbit);
+    char ch;
     try {
         patchReader.open(".test/newPatches.txt");
+        readCharIgnoreWS(patchReader, ch);
         while (patchReader.good()) {
-            cout << "Nice";
+            name += ch;
+            ch = readName(patchReader, name);
+            while (ch == '[') {
+                readPayload(patchReader, payload, n_loops);
+                readOffsets(patchReader, offsets);
+                data.push_back({payload, offsets, n_loops});
+                readCharIgnoreWS(patchReader, ch);
+            }
+
+            patchList.push_back(Patch_new(name, data));
+            name.clear();
+            offsets.clear();
+            data.clear();
         }
     }
     catch (const ifstream::failure& f) {
@@ -115,6 +131,12 @@ int main (int argc, char* argv[]) {
         char *path = argv[1];
         if (checkMD5(path, rpxHash)) {
             cout << "Commencing patch process.\n";
+            vector<Patch_new> patchList;
+            newGetPatches(patchList);
+            for (auto & element : patchList) {
+                cout << element.name << "\n";
+            }
+            /*
             vector<Patch> patchList;
             getPatches(patchList);
             if (!applyPatches(patchList, path)){
@@ -123,6 +145,7 @@ int main (int argc, char* argv[]) {
             else {
                 cout << patchError;
             }
+            */
         }
         else {
             cout << md5Error;

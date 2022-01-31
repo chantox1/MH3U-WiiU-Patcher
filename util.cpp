@@ -17,6 +17,77 @@ void stripFilename(char *in, char *out) {
     strcat(out, dir);
 }
 
+void rTrimWhiteSpace(std::string &s) {
+    s.erase(s.find_last_not_of(whiteSpace) + 1);
+}
+
+bool chInString(char ch, std::string str) {
+    return (str.find(ch) != std::string::npos);
+}
+
+void readCharIgnoreWS(std::ifstream &fs, char &ch) {
+    fs.get(ch);
+    while(chInString(ch, whiteSpace) && fs.good()) {
+        fs.get(ch);
+    }
+}
+
+char readName(std::ifstream &fs, std::string &name) {
+    char ch;
+    readCharIgnoreWS(fs, ch);
+    while (ch != '[') {
+        name += ch;
+        readCharIgnoreWS(fs, ch);
+    }
+    return ch;
+}
+
+void readPayload(std::ifstream &fs, std::string &payload, int &n_loops) {
+    char b[3];
+    b[2] = '\0';    //strtol requires c-string
+    readCharIgnoreWS(fs, b[0]);
+    while (b[0] != '@' && b[0] != 'x') {
+        readCharIgnoreWS(fs, b[1]);
+        int val = strtol(b, nullptr, 16);
+        payload += (unsigned char) val;
+
+        readCharIgnoreWS(fs, b[0]);
+    }
+
+    // Get n_loops
+    if (b[0] == '@') {
+        n_loops = 1;
+    }
+    else {
+        char ch;
+        std::string s;
+        readCharIgnoreWS(fs, ch);
+        while (ch != '@') {
+            s += ch;
+            readCharIgnoreWS(fs, ch);
+        }
+        n_loops = std::stoi(s);
+    }
+}
+
+void readOffsets(std::ifstream &fs, std::vector<int> &offsets) {
+    std::string offset;
+    char ch;
+
+    readCharIgnoreWS(fs, ch);
+    offset += ch;
+    while (ch != ']') {
+        readCharIgnoreWS(fs, ch);
+        while (ch != ',' && ch != ']') {
+            offset += ch;
+            readCharIgnoreWS(fs, ch);
+        }
+        offsets.push_back(stoi(offset, nullptr, 0));
+        offset.clear();
+    }
+}
+
+
 bool checkMD5(char *path, const unsigned char *hash) {
     std::ifstream t;
     char *fileBuffer;

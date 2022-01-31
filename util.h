@@ -9,7 +9,15 @@
 #include <string>
 #include <vector>
 
+const std::string whiteSpace = " \t\n\r\f\v";
+
 void stripFilename(char *in, char *out);
+void rTrimWhiteSpace(std::string &s);
+bool chInString(char ch, std::string str);
+void readCharIgnoreWS(std::ifstream &fs, char &ch);
+char readName(std::ifstream &fs, std::string &name);
+void readPayload(std::ifstream &fs, std::string &payload, int &n_loops);
+void readOffsets(std::ifstream &fs, std::vector<int> &offsets);
 bool checkMD5(char *path, const unsigned char *hash);
 int loadFile(std::ifstream &t, char **fileBuffer, unsigned long &filesize, char *path);
 std::string hexifyStr(std::string str);
