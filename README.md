@@ -1,3 +1,7 @@
+# Deprecated! New version located [here](https://github.com/chantox1/MH3U-RPX-Patcher/tree/main).
+
+
+
 # MH3U RPX Patcher
 
 Binary patcher for MH3U. Currently features two patches, **BaseDefTo1** and **RawDebloater**. 
